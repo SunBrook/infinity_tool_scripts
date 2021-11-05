@@ -1,8 +1,8 @@
 /* 本脚本仅供个人学习交流使用，请勿商用!!!
  *
  * 作者：曦源  QQ: 1724464648
- * 版本：v0.0.1
- * 时间：2020/2/11
+ * 版本：v1.0.0
+ * 时间：2021/11/5
  * 功能：将用户网站数据生成并导出 excel表功能
  *
  *
@@ -39,27 +39,26 @@ function GetWebInfoV2() {
     }
 
     //用户收藏的网站json字符串
-    var userList = storage["infinity-icons"];
-    if (!userList) {
+    var store_site = storage["store-site"];
+    if (!store_site) {
         alert("请检查登录状态，并检查是否将数据同步到本地，确认无误后再执行此脚本");
         return;
     }
 
-    console.log("用户数据", userList);
-
     //字符串 转 ToJson对象
-    var u_list = JSON.parse(userList);
+    var u_list = JSON.parse(store_site).sites;
+
     //遍历 - 每页
     for (let i = 0; i < u_list.length; i++) {
         var page_list = u_list[i]; //某一页
         for (let j = 0; j < page_list.length; j++) {
             var unit_list = page_list[j]; //某个单元格
-            var image_type = unit_list.imageType;
+            var image_type = unit_list.bgType;
             //判断是 单个网站 还是文件夹 image / folder
             if (image_type == "image" || image_type == "color") {
                 //单个网站 纯色
                 //网站
-                var url = unit_list.url;
+                var url = unit_list.target;
                 //过滤 infinity:// 开头的官方应用
                 var fdStart = url.indexOf("infinity://");
                 if (fdStart == 0) continue;
@@ -71,16 +70,16 @@ function GetWebInfoV2() {
                     '<td style="border: 1px solid #ccc;padding:5px;height:25px;"  align="center"></td>' +
                     '</tr>';
                 tb_count++;
-            } else if (image_type == "folder") {
+            } else if (image_type == undefined) {
                 //文件夹
                 //文件夹名称
                 var folder_name = unit_list.name;
                 //文件夹子项集合
-                var folder_list = unit_list.items;
+                var folder_list = unit_list.children;
                 //只要用户自定义的网站集合
                 var item_user_disposed = new Array();
                 for (let k = 0; k < folder_list.length; k++) {
-                    var url = folder_list[k].url;
+                    var url = folder_list[k].target;
                     var fdStart = url.indexOf("infinity://");
                     if (fdStart == 0) continue;
                     item_user_disposed.push({ url: url, name: folder_list[k].name });
@@ -115,11 +114,11 @@ function GetWebInfoV2() {
     console.log("网站个数：", tb_count);
 
     // tableToExcel('z_table', " 累计 " + tb_count + " 个网站"); //直接下载
-    var userInfo = storage["infinity-user"];
+    var userInfo = storage["store-user"];
     if (!userInfo) {
         tableToExcel('z_table', "累计 " + tb_count + " 个网站", "InfinityPro " + getCurrentDate(2));
     } else {
-        var user_info = JSON.parse(userInfo);
+        var user_info = JSON.parse(userInfo).userInfo;
         if(user_info.name){
             var space = " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
             tableToExcel('z_table', "用户：" + user_info.name + space + "共收藏 " + tb_count + " 个网站", "InfinityPro " + getCurrentDate(2));
