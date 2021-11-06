@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Infinity 导出 Excel
-// @version      0.0.1
+// @version      1.0.5
 // @icon         https://inftab.com/icon/favicon.ico
 // @description  Infinity Pro 网站版，将您保存的网站导出为一个 Excel 文件。导出前需要登录账号，如果导出的网站为空，请先刷新界面。
 // @author       曦源 <pinkones@qq.com>
@@ -13,41 +13,49 @@
 // @homepageURL  https://github.com/SunBrook/infinity_tool_scripts
 // ==/UserScript==
 
+
 'use strict';
 
-// 目标位置
-var backup_btn_box = document.querySelector("side-profile")
-                        .shadowRoot.querySelector("side-user")
-                        .shadowRoot.querySelector("infinito-card.backup-recovery .backup-btn-box");
+function init(){
+    // 目标位置
+    var backup_btn_box = document.querySelector("side-profile")
+    .shadowRoot.querySelector("side-user")
+    .shadowRoot.querySelector("infinito-card.backup-recovery .backup-btn-box");
 
-// 创建 Excel 导出页面元素
-var export_excel_node = document.createElement("div");
-export_excel_node.className = "backup-btn-card";
-export_excel_node.innerHTML = ''+
-'<div class="backup-btn-content"  onClick="GetWebInfoV2()">'+
-        '<div class="backup-btn">'+
-        '<div class="backup-btn-title">'+
-            '<span class="backup-btn-title-text"><!---->导出 Excel 文件<!----></span>'+
-            '<i-svg></i-svg>'+
-        '</div>'+
-        '<span class="backup-btn-desc"><!---->从当前本地数据导出<!----></span>'+
-        '</div>'+
+    // 创建 Excel 导出页面元素
+    var export_excel_node = document.createElement("div");
+    export_excel_node.className = "backup-btn-card";
+    export_excel_node.innerHTML = ''+
+    '<div class="backup-btn-content" id="ExportExcel">'+
+    '<div class="backup-btn">'+
+    '<div class="backup-btn-title">'+
+    '<span class="backup-btn-title-text"><!---->导出 Excel 文件<!----></span>'+
+    '<i-svg></i-svg>'+
+    '</div>'+
+    '<span class="backup-btn-desc"><!---->从当前本地数据导出<!----></span>'+
+    '</div>'+
     '</div>';
 
-
-
-// 创建完成后，然后在设置图标
-var createFirst = new Promise(function (resolve, reject){
+    // 创建完成后，然后在设置图标
+    var createFirst = new Promise(function (resolve, reject){
     backup_btn_box.append(export_excel_node);
     resolve("finish");
-});
+    });
 
-createFirst.then(function(message){
+    createFirst.then(function(message){
     // 设置导出图标样式
     var ico_svg = backup_btn_box.querySelector(".backup-btn-card:nth-child(4) .backup-btn-title i-svg")
-                        .shadowRoot.querySelector(".svg");
+    .shadowRoot.querySelector(".svg");
     ico_svg.style.webkitMaskImage = "url(/images/arrow-right.d51ffb7.svg)";
-});
+    });
+
+    backup_btn_box.querySelector(".backup-btn-card:nth-child(4) div#ExportExcel").onclick = function(){
+        GetWebInfoV2();
+    }
+}
+
+setTimeout(init, 3000);
+
 
 //网站数量
 var tb_count = 0;
